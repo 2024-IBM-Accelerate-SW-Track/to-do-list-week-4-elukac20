@@ -22,14 +22,14 @@ class AddTodo extends Component {
   handleChange = (event) => {
     this.setState({
       content: event.target.value,
-      date: Date()
+      date: Date().toLocaleString('en-US').toLowerCase()
     });
   };
 
   handleDateChange = (event) => {
     let date = null
     if(event != null){
-      date = new Date(event)
+      date = new Date(event).toLocaleDateString('en-US').toLowerCase()
     }
     this.setState({
       duedate: date
@@ -59,8 +59,6 @@ class AddTodo extends Component {
     }).then(res => {
         console.log(res.data.message);
     });
-
-
       this.props.addTodo(this.state);
       this.setState({
         content: "",
@@ -81,6 +79,8 @@ class AddTodo extends Component {
       <div>
         <TextField
           label="Add New Item"
+          id="new-item-input"
+
           variant="outlined"
           onChange={this.handleChange}
           value={this.state.content}
@@ -88,6 +88,8 @@ class AddTodo extends Component {
         <LocalizationProvider dateAdapter={AdapterDateFns}>         
           <DesktopDatePicker
               id="new-item-date"
+              data-testid="new-item-date"
+
               label="Due Date"
               value={this.state.duedate}
               onChange={this.handleDateChange}
