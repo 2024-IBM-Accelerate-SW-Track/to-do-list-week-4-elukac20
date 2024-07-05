@@ -1,7 +1,10 @@
+import Axios from "axios";
 import React, { Component } from "react";
 import { Button, TextField } from "@mui/material";
 import { DesktopDatePicker , LocalizationProvider} from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+
+
 
 class AddTodo extends Component {
   // Create a local react state of the this component with both content date property set to nothing.
@@ -19,14 +22,14 @@ class AddTodo extends Component {
   handleChange = (event) => {
     this.setState({
       content: event.target.value,
-      date: Date()
+      date: Date().toLocaleString('en-US').toLowerCase()
     });
   };
 
   handleDateChange = (event) => {
     let date = null
     if(event != null){
-      date = new Date(event)
+      date = new Date(event).toLocaleDateString('en-US').toLowerCase()
     }
     this.setState({
       duedate: date
@@ -39,6 +42,23 @@ class AddTodo extends Component {
   handleSubmit = (event) => {
     event.preventDefault();
     if (this.state.content.trim()) {
+      const jsonObject = {
+        id: this.state.id,
+        task: this.state.content,
+        currentDate: this.state.date,
+        dueDate: this.state.duedate
+     };
+
+     Axios({
+      method: "POST",
+      url: "http://localhost:8080/add/item",
+      data: {jsonObject},
+      headers: {
+         "Content-Type": "application/json"
+      }
+    }).then(res => {
+        console.log(res.data.message);
+    });
       this.props.addTodo(this.state);
       this.setState({
         content: "",
@@ -59,6 +79,8 @@ class AddTodo extends Component {
       <div>
         <TextField
           label="Add New Item"
+          id="new-item-input"
+
           variant="outlined"
           onChange={this.handleChange}
           value={this.state.content}
@@ -66,6 +88,8 @@ class AddTodo extends Component {
         <LocalizationProvider dateAdapter={AdapterDateFns}>         
           <DesktopDatePicker
               id="new-item-date"
+              data-testid="new-item-date"
+
               label="Due Date"
               value={this.state.duedate}
               onChange={this.handleDateChange}
